@@ -48,7 +48,6 @@ const registerUser = async (req, res) => {
   }
 };
 
-
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -75,7 +74,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 const getUserProfile = async (req, res) => {
   try {
     const user = await req.user; // `protect` middleware already loads the user without the password
@@ -84,35 +82,36 @@ const getUserProfile = async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    return res.status(500).json({ message: "server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "server error", error: error.message });
   }
 };
 
-
 const updateUserProfile = async (req, res) => {
-try{
-    const user=await req.user
-    if(!user){
-      return res.status(404).json({message:"User Not Found"});
+  try {
+    const user = await req.user;
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found" });
     }
-    user.name=req.body.name||user.name;
-    user.email=req.body.email||user.email;
-if(req.body.password){
-  const salt=bcrypt.genSalt(10)
-  const hashedPassword=bcrypt.hash(req.body.password,salt);
-}
-const updatedUser=await user.save();
-res.json({
-  _id:updateUser._id,
-  name:updatedUser.name,
-  email:updatedUser.email,
-role:updatedUser.role,
-token:generateToken(updatedUser._id)
-})
-
-}
-catch(error){
-    return res.status(500).json({message:"sercer error",error:error.message})
-}
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    if (req.body.password) {
+      const salt = bcrypt.genSalt(10);
+      const hashedPassword = bcrypt.hash(req.body.password, salt);
+    }
+    const updatedUser = await user.save();
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      token: generateToken(updatedUser._id),
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "sercer error", error: error.message });
+  }
 };
 module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile };

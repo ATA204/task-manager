@@ -52,10 +52,10 @@ const getTasks = async (req, res) => {
         "name email profileImageUrl",
       );
     } else {
-      tasks = await Task.find({ ...filter, assignedTo: { $in: [req.user._id] } }).populate(
-        "assignedTo",
-        "name email profileImageUrl",
-      );
+      tasks = await Task.find({
+        ...filter,
+        assignedTo: { $in: [req.user._id] },
+      }).populate("assignedTo", "name email profileImageUrl");
     }
 
     tasks = await Promise.all(
@@ -64,12 +64,12 @@ const getTasks = async (req, res) => {
           (item) => item.completed,
         ).length;
         // console.log(`completed count ${completedCount}`);
-        
+
         return { ...task._doc, completedCount: completedCount };
       }),
     );
     // console.log(tasks);
-    
+
     const allTasks = await Task.countDocuments(
       req.user.role === "admin" ? {} : { assignedTo: { $in: [req.user._id] } },
     );
@@ -117,7 +117,12 @@ const findTaskById = async (req, res) => {
     res.json({
       task,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error({
+      message: "error fetching task by ID",
+      error: error.message,
+    });
+  }
 };
 const upadtaTask = async (req, res) => {
   try {
@@ -199,7 +204,9 @@ const updateTaskChecklist = async (req, res) => {
     );
 
     if (!isAssignedUser && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Not Authorized to Update Checklist" });
+      return res
+        .status(403)
+        .json({ message: "Not Authorized to Update Checklist" });
     }
 
     const nextTodoCheckList = Array.isArray(todoCheckList)
@@ -351,9 +358,8 @@ const getUserDashboard = async (req, res) => {
     ]);
 
     const taskPiriorityLevels = piriorities.reduce((acc, piriority) => {
-      acc[piriority] = taskPirioritiesRaw.find(
-        (item) => item._id === piriority,
-      )?.count || 0;
+      acc[piriority] =
+        taskPirioritiesRaw.find((item) => item._id === piriority)?.count || 0;
       return acc;
     }, {});
 
