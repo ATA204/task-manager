@@ -2,6 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const { onUserRegistered } = require("../services/notificationEvents");
 
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -33,6 +34,7 @@ const registerUser = async (req, res) => {
       role,
       profileImageUrl,
     });
+    onUserRegistered(user)  //member gdeed
     res.status(200).json({
       _id: user._id,
       name: user.name,

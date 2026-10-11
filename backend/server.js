@@ -6,7 +6,10 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
-const reportRoutes=require("./routes/reportRoutes")
+const reportRoutes = require("./routes/reportRoutes")
+const notificationRoutes = require("./models/Notification")
+const http = require("http");
+const { initSocket } = require("./appSocket");
 
 const app = express();
 
@@ -28,10 +31,20 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
-app.use("/api/report",reportRoutes)
-app.use("/uploads",express.static(path.join(__dirname,'uploads')))
+app.use("/api/report", reportRoutes)
+app.use("/api/notifications", notificationRoutes)
+app.use("/uploads", express.static(path.join(__dirname, 'uploads')))
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`sever is running on port ${PORT}`);
-});
+
+const httpServer = http.createServer(app);
+initSocket(httpServer);
+
+const PORT = process.env.PORT || 8000;
+
+httpServer.listen(PORT,()=>{
+  console.log(`server (API + socket) is running on port ${PORT}`);
+  
+})
+
+
+

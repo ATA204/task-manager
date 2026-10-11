@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const { onTaskCreated, onTaskUpdated, onTaskDeleted, onTaskStatusChanged, onChecklistUpdated } = require("../services/notificationEvents");
 
 const createTask = async (req, res) => {
   try {
@@ -31,6 +32,8 @@ const createTask = async (req, res) => {
       attachments,
       todoCheckList,
     });
+
+    onTaskCreated(task, req.user); //Notification
     res.status(201).json({ message: "Task Created Successfully ", task });
   } catch (error) {
     return res
@@ -130,6 +133,7 @@ const upadtaTask = async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task Not Found" });
     }
+    const before = task.toObject()
     task.title = req.body.title || task.title;
     task.description = req.body.description || task.description;
     task.piriority = req.body.piriority || task.piriority;
@@ -144,6 +148,7 @@ const upadtaTask = async (req, res) => {
     task.assignedTo = req.body.assignedTo || task.assignedTo;
 
     const updatedTask = await task.save();
+    onTaskUpdated(updatedTask, before, req.user) //Notification
     res.status(200).json({ message: "Task Updated Successfully", updatedTask });
   } catch (error) {
     return res
@@ -158,7 +163,9 @@ const deleteTask = async (req, res) => {
     if (!task) {
       return res.status(404).json({ message: "Task Not Found" });
     }
+
     await task.deleteOne();
+    onTaskDeleted(task, req.user); //Notification
     res.json({ message: "Task Deleted Successfully" });
   } catch (error) {
     return res
@@ -169,12 +176,18 @@ const deleteTask = async (req, res) => {
 const updateTaskStatus = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: "Task Not Found" })
+    }
     const isAssigned = task.assignedTo.some(
       (userId) => userId.toString() === req.user._id.toString(),
     );
     if (!isAssigned && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not Authorized" });
     }
+
+    const oldStatus = task.status;
+
     task.status = req.body.status || task.status;
 
     if (task.status === "Completed") {
@@ -182,6 +195,7 @@ const updateTaskStatus = async (req, res) => {
       task.progress = 100;
     }
     await task.save();
+    onTaskStatusChanged(oldStatus, task, req.user)
     res.json({ message: "Stauts Updated", task });
   } catch (error) {
     return res
@@ -218,7 +232,7 @@ const updateTaskChecklist = async (req, res) => {
     if (!nextTodoCheckList) {
       return res.status(400).json({ message: "todoCheckList is required" });
     }
-
+    const before = { status: task.status, progress: task.progress }
     task.todoCheckList = nextTodoCheckList;
     const completedItems = task?.todoCheckList.filter(
       (item) => item.completed,
@@ -234,6 +248,7 @@ const updateTaskChecklist = async (req, res) => {
       task.status = "Pending";
     }
     await task.save();
+    onChecklistUpdated(task, before, req.user);
     const updatedTask = await Task.findById(req.params.id).populate(
       "assignedTo",
       "name email profileImageUrl",

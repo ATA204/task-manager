@@ -50,7 +50,7 @@ const Dashboard = () => {
       );
       setDashboardData(response.data);
       prepareChartsData(response.data?.charts || null);
-            console.log(barChartData);
+            // console.log(barChartData);
     } catch (error) {
       console.error("Error fetching users", error);
       
