@@ -4,14 +4,11 @@ import { useUserAuth } from "../hooks/useUserAuth";
 import { UserContext } from "../context/UserContext";
 
 const PrivateRoute = ({ allowedRoles }) => {
-  const { user, loading } = useContext(UserContext);
+  const { user, loadingUser } = useContext(UserContext);
 
-  // console.log("User:", user);
-  // console.log("Allowed role:", allowedRoles);
-  // console.log(allowedRoles);
   let location = useLocation();
-  // console.log(location);
-  if (!loading) {
+  
+  if (!loadingUser) {
     if (!user) {
       return <Navigate to={"/login"} />;
     }

@@ -71,41 +71,61 @@ const getTasks = async (req, res) => {
         return { ...task._doc, completedCount: completedCount };
       }),
     );
-    // console.log(tasks);
 
-    const allTasks = await Task.countDocuments(
-      req.user.role === "admin" ? {} : { assignedTo: { $in: [req.user._id] } },
-    );
-    const pendingTasks = await Task.countDocuments({
-      ...filter,
-      status: "Pending",
-      ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
-    });
-    const completedTasks = await Task.countDocuments({
-      ...filter,
-      status: "Completed",
-      ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
-    });
-    const inProgressTasks = await Task.countDocuments({
-      ...filter,
-      status: "In Progress",
-      ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
-    });
+    const [allTasks, pendingTasks, completedTasks, inProgressTasks] = await Promise.all([
+      Task.countDocuments(
+        req.user.role === "admin" ? {} : { assignedTo: { $in: req.user._id } }
+      ),
+      Task.countDocuments({
+        ...filter,
+        status: "Pending",
+        ...(req.user.role !== "admin" && { assignedTo: { $in: req.user._id } })
+      }),
+      Task.countDocuments({
+        ...filter,
+        status: "Completed",
+        ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } })
+      }),
+       Task.countDocuments({
+  ...filter,
+  status: "In Progress",
+  ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } })
+}),
 
-    res.json({
-      tasks,
-      statusSummary: {
-        allTasks,
-        pendingTasks,
-        completedTasks,
-        inProgressTasks,
-      },
-    });
+    ])
+// const allTasks = await Task.countDocuments(
+//   req.user.role === "admin" ? {} : { assignedTo: { $in: [req.user._id] } },
+// );
+// const pendingTasks = await Task.countDocuments({
+//   ...filter,
+//   status: "Pending",
+//   ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
+// });
+// const completedTasks = await Task.countDocuments({
+//   ...filter,
+//   status: "Completed",
+//   ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
+// });
+// const inProgressTasks = await Task.countDocuments({
+//   ...filter,
+//   status: "In Progress",
+//   ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
+// });
+
+res.json({
+  tasks,
+  statusSummary: {
+    allTasks,
+    pendingTasks,
+    completedTasks,
+    inProgressTasks,
+  },
+});
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
-  }
+  return res
+    .status(500)
+    .json({ message: "Server error", error: error.message });
+}
 };
 
 const findTaskById = async (req, res) => {
@@ -261,14 +281,22 @@ const updateTaskChecklist = async (req, res) => {
 const getDashboardData = async (req, res) => {
   try {
     //fetch statistics
-
-    const totalTasks = await Task.countDocuments();
-    const pendingTasks = await Task.countDocuments({ status: "Pending" });
-    const completedTasks = await Task.countDocuments({ status: "Completed" });
-    const overDueTasks = await Task.countDocuments({
-      status: { $ne: "Completed" },
-      dueDate: { $lt: new Date() },
-    });
+    const [totalTasks, pendingTasks, completedTasks, overDueTasks] = await Promise.all([
+      Task.countDocuments(),
+      Task.countDocuments({ status: "Pending" }),
+      Task.countDocuments({ status: "Completed" }),
+      Task.countDocuments({
+        status: { $ne: "Completed" },
+        dueDate: { $lt: new Date() }
+      })
+    ])
+    // const totalTasks = await Task.countDocuments();
+    // const pendingTasks = await Task.countDocuments({ status: "Pending" });
+    // const completedTasks = await Task.countDocuments({ status: "Completed" });
+    // const overDueTasks = await Task.countDocuments({
+    //   status: { $ne: "Completed" },
+    //   dueDate: { $lt: new Date() },
+    // });
 
     const taskStatuses = ["Pending", "Completed", "In Progress"];
     const taskDistributionRaw = await Task.aggregate([

@@ -7,9 +7,10 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const reportRoutes = require("./routes/reportRoutes")
-const notificationRoutes = require("./models/Notification")
+const notificationRoutes = require("./routes/notificationRoutes")
 const http = require("http");
 const { initSocket } = require("./appSocket");
+const { startTaskReminderJob } = require("./controllers/taskRemindeers");
 
 const app = express();
 
@@ -32,7 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/report", reportRoutes)
-app.use("/api/notifications", notificationRoutes)
+app.use("/api/notifications", notificationRoutes);
 app.use("/uploads", express.static(path.join(__dirname, 'uploads')))
 
 
@@ -41,10 +42,10 @@ initSocket(httpServer);
 
 const PORT = process.env.PORT || 8000;
 
-httpServer.listen(PORT,()=>{
+httpServer.listen(PORT, () => {
   console.log(`server (API + socket) is running on port ${PORT}`);
-  
-})
+  startTaskReminderJob();
+});
 
 
 

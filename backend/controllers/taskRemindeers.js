@@ -43,7 +43,14 @@ const checkDueDates = async () => {
         }
     }
     catch (error) {
-        console.error("[reminders] check failed:", error.message);
+        console.error({message:"[reminders] check failed:",error: error.message});
 
     }
+
 }
+const startTaskReminderJob = () => {
+    checkDueDates();
+    setInterval(checkDueDates, CHECK_EVERY_MS);
+};
+
+module.exports = { startTaskReminderJob };

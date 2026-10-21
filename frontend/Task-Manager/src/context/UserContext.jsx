@@ -6,13 +6,13 @@ export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
   useEffect(() => {
     if (user) return;
 
     const accessToken = localStorage.getItem("token");
     if (!accessToken) {
-      setLoading(false);
+      setLoadingUser(false);
       return;
     }
 
@@ -24,7 +24,7 @@ const UserProvider = ({ children }) => {
         console.error("User is not Authnticated", error);
         clearUser();
       } finally {
-        setLoading(false);
+        setLoadingUser(false);
       }
     };
     fetchUser()
@@ -33,19 +33,19 @@ const UserProvider = ({ children }) => {
   const clearUser=()=>{
     setUser(null)
     localStorage.removeItem("token")
-    setLoading(false)
+    setLoadingUser(false)
 
   }
   const updateUser=(userData)=>{
     setUser(userData);
     localStorage.setItem("token",userData.token)
-    setLoading(false)
+    setLoadingUser(false)
 
 
   }
 
   return(
-    <UserContext.Provider value={{loading,user,clearUser,updateUser} }>
+    <UserContext.Provider value={{loadingUser,user,clearUser,updateUser} }>
         {children}
     </UserContext.Provider>
   )

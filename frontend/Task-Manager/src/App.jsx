@@ -12,11 +12,12 @@ import MyTasks from "./pages/User/MyTasks";
 import ViewTaskDetails from "./pages/User/ViewTaskDetails";
 import UserProvider, { UserContext } from "./context/UserContext";
 import {Toaster} from 'react-hot-toast'
+import NotificationProvider from "./context/NotificationContext";
 
 function App() {
   return (
     <UserProvider>
-    
+      <NotificationProvider> 
     <div>
       <Router>
         <Routes>
@@ -47,14 +48,15 @@ function App() {
       },
     }}
     />
+    </NotificationProvider>
     </UserProvider>
   );
 }
 
 export default App;
  const Root=()=>{
-   const {loading, user}=useContext(UserContext)
-   if(loading) return <Outlet/>
+   const {loadingUser, user}=useContext(UserContext)
+   if(loadingUser) return <Outlet/>
    if(!user){
      return <Navigate to='/login'/>
    }

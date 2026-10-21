@@ -19,8 +19,8 @@ export const API_PATHS = {
     GET_ALL_TASKS: "/api/tasks",
     GET_TASK_BY_ID: (taskId) => `api/tasks/${taskId}`,
     CREATE_TASK: "/api/tasks",
-    UPDATE_TASK:(taskId)=> `api/tasks/${taskId}`,
-    DELETE_TASK: (taskId)=>`api/tasks/${taskId}`,
+    UPDATE_TASK: (taskId) => `api/tasks/${taskId}`,
+    DELETE_TASK: (taskId) => `api/tasks/${taskId}`,
     UPDATE_TASK_STATUS: (taskId) => `/api/tasks/${taskId}/status`,
     UPDATE_TASK_TODOCHECKLIST: (taskId) => `/api/tasks/${taskId}/todo`,
   },
@@ -31,4 +31,11 @@ export const API_PATHS = {
   IMAGE: {
     UPLOAD_IMAGE: "/api/auth/upload-image",
   },
+  NOTIFICATIONS: {
+    GET_ALL: "/api/notifications",
+    MARK_AS_READ: (id) => `/api/notifications/${id}/read`,
+    MARK_ALL_AS_READ: "/api/notifications/read-all",
+    DELETE: (id) => `/api/notifications/${id}`,
+    CLEAR_ALL: "/api/notifications"
+  }
 };
