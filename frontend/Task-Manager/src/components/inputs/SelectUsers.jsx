@@ -14,7 +14,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
   const getAllUsers = async () => {
     try {
       const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS);
-       console.log(response.data);
+      //  console.log(response.data);
 
       if (response.data?.length > 0) {
         setAllUsers(response.data);
@@ -33,7 +33,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
   const handleAssign = () => {
     setSelectedUsers(tempSelectedUsers);
     setIsModalOpen(false);
-    console.log(selectedUsersAvatars);
+    // console.log(selectedUsersAvatars);
     
     
   };

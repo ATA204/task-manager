@@ -27,7 +27,7 @@ const taskCreated = async (task, actor) => {
             recipients: task.assignedTo,
             actor,
             type: NOTIFICATION_TYPES.TASK_ASSIGNED,
-            message: `${actor.name} assigned you ${task.name}`,
+            message: `${actor.name} assigned you ${task?.title}`,
             title: "New Task assigned",
             task: task._id,
             meta: { dueDate: task.dueDate, piriority: task.piriority },
@@ -85,7 +85,7 @@ const taskDeleted = async (task, actor) => {
         actor,
         type: NOTIFICATION_TYPES.TASK_DELETED,
         title: "Task Deleted",
-        message: `${actor.name} deleted ${task.name}`,
+        message: `${actor.name} deleted ${task.title}`,
         meta: { taskTitle: task.title },
 
     });
@@ -94,9 +94,6 @@ const taskDeleted = async (task, actor) => {
 const taskStatusChanged = async (oldStatus, task, actor) => {
     if (oldStatus === task.status) return; //Nothing changed
 
-    // const allPeople = peopleOnTask(task);
-    // const actorId = (actor?._id || actor).toString()
-    // const recipients = [...new Set(allPeople)].map((id) => String(id?._id || id)).filter((id) => (id && id !== actorId)) //recepients not the one who did the change
     const completed = task.status === "Completed";
     const recipients = chooseRecepients(peopleOnTask(task), actor)
 

@@ -48,7 +48,7 @@ const notify = async ({
 
 const notifyAdmins = async (payload) => {
     const admins = await User.find({ role: "admin" }).select("_id");
-    return notify({ ...payload, admins })
+    return notify({ ...payload,recipients: admins })
 }
 
 module.exports = { notify, notifyAdmins };

@@ -158,7 +158,7 @@ return;
       const response = await axiosInstance.get(
         API_PATHS.TASKS.GET_TASK_BY_ID(taskId)
       );
-      console.log(location);
+      // console.log(location);
 
       if (response.data) {
         const taskInfo = response.data.task;

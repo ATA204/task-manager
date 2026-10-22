@@ -4,6 +4,8 @@ import { NotificationContext } from "../../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
 import { LuBell, LuCheckCheck, LuTrash2 } from "react-icons/lu";
 import moment from "moment";
+import axiosInstance from "../../utils/axiosinstance";
+import { API_PATHS } from "../../utils/apiPaths";
 
 const NotificationBell = () => {
   const { user } = useContext(UserContext);
@@ -21,28 +23,49 @@ const NotificationBell = () => {
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
   const navigate = useNavigate();
+  const [tasks, setTasks] = useState([]);
+  const getTasks = async () => {
+    const response = await axiosInstance.get(API_PATHS.TASKS.GET_ALL_TASKS);
+    setTasks(response?.data?.tasks);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (panelRef.current && !panelRef.current.contains(e.target))
         setOpen(false);
     };
+    getTasks();
 
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleOpen = (notification) => {
     markAsRead(notification._id);
+
+
     setOpen(false);
-    if (!notification.task) return;
+    const taskId = notification?.task;
+    
+    const clickedTask = tasks.find((t) => t._id === taskId);
+    const assignedList = clickedTask?.assignedTo || [];
+    const isAssigned = assignedList.some(
+      (asignee) => String(asignee?._id) === String(user._id),
+    );
+    console.log(clickedTask);
     if (user.role === "admin") {
       navigate(`/admin/create-task`, {
-        state: { taskId: notification.task._id },
+        state: { taskId },
       });
     } else {
-      navigate(`/user/tasks/${notification.task}`);
+      if (isAssigned) {
+        navigate(`/user/tasks/${taskId}`);
+      }
+      else{
+        console.warn("you're Not assignee in this task any more")
+      }
     }
   };
 
@@ -74,7 +97,10 @@ const NotificationBell = () => {
                 </button>
               )}
               {notifications.length > 0 && (
-                <button className="text-xs text-gray-500 hover:text-rose-500 cursor-pointer">
+                <button
+                  className="text-xs text-gray-500 hover:text-rose-500 cursor-pointer"
+                  onClick={clearAll}
+                >
                   Clear
                 </button>
               )}
@@ -87,14 +113,14 @@ const NotificationBell = () => {
                 No notifications yet
               </p>
             ) : (
-              notifications.map((n) => (
+              notifications?.map((n) => (
                 <div
                   key={n._id}
                   onClick={() => handleOpen(n)}
-                  className={`flex gap-3 px--4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer ${n.read ? "" : "bg-blue-50/60"} `}
+                  className={`flex gap-3 px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer ${n.read ? "" : "bg-blue-50/60"} `}
                 >
                   <span
-                    className={`mt-1.5 w-2 h2 rounded-full shrink-0 ${
+                    className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
                       n.read ? "bg-transparent" : "bg-primary"
                     }`}
                   />
@@ -113,8 +139,7 @@ const NotificationBell = () => {
                     className="text-gray-300 hover:text-rose-500 cursor-pointer self-start text-lg"
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteNotification(n._id)
-
+                      deleteNotification(n._id);
                     }}
                   >
                     <LuTrash2 />
@@ -122,14 +147,13 @@ const NotificationBell = () => {
                 </div>
               ))
             )}
-            {hasMore&&(
+            {hasMore && (
               <button
-              className="w-full text-xs text-primary py-2 hover:bg-gray-50 cursor-pointer"
-              disabled={loading}
-              onClick={loadMore}
+                className="w-full text-xs text-primary py-2 hover:bg-gray-50 cursor-pointer"
+                disabled={loading}
+                onClick={loadMore}
               >
-                {loading?"Loading...":"Load More"}
-
+                {loading ? "Loading..." : "Load More"}
               </button>
             )}
           </div>

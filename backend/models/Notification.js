@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { NOTIFICATION_TYPES } = require("../utils/notificationTypes");
+const Task = require("./Task");
 
 const notificationSchema = new mongoose.Schema({
     userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
@@ -13,6 +14,7 @@ const notificationSchema = new mongoose.Schema({
     read: { type: Boolean, default: false },
     readAt: { type: Date, default: null },
     meta: { type: Object, default: {} },
+    task: { type: mongoose.Types.ObjectId, ref: Task, default: null }
 
 },
     { timestamps: true }

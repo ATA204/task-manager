@@ -33,7 +33,7 @@ const getNotifications = async (req, res) => {
 const markAsRead = async (req, res) => {
     try {
         const notification = await Notification.findByIdAndUpdate(
-            { userId: req.user._id, _id: req.params._id },
+            { userId: String(req.user._id), _id: req?.params?.id},
             { read: true, readAt: Date.now() },
             { new: true }
         )
@@ -70,12 +70,12 @@ const markAllRead = async (req, res) => {
 
 const deleteNotification = async (req, res) => {
     try {
-        const notification = await Notification.deleteOne(
+        const result = await Notification.deleteOne(
             {
                 userId: req.user._id,
                 _id: req.params.id,
             });
-        if (!notification) {
+        if (result.deletedCount===0) {
             return res.status(404).json({ message: "Notification Not Found" })
         }
         res.json({ message: "Notification Deleted" })
@@ -93,7 +93,7 @@ const deleteNotification = async (req, res) => {
 const clearAllNotifications = async (req, res) => {
     try {
         const notifications = await Notification.deleteMany({
-            userId: req.user_id,
+            userId: req.user._id,
         });
         res.json({
             message: "All Notifications Cleared"

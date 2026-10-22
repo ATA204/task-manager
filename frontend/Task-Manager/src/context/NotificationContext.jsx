@@ -33,10 +33,10 @@ const NotificationProvider = ({ children }) => {
       const data = response.data;
       setNotifications((prev) => {
         if (pageToLoad === 1) return data.notifications;
-        const existingIds = new Set(prev.filter((n) => n._id));
+        const existingIds = new Set(prev.map((n) => n._id));
         return [
           ...prev,
-          ...data.notifications.map((n) => !existingIds.has(n._id)),
+          ...data.notifications.filter((n) => !existingIds.has(n._id)),
         ];
       });
       setUnreadCount(data.unreadCount);
@@ -63,7 +63,7 @@ const NotificationProvider = ({ children }) => {
     const socket = io(BASE_URL, {
       auth: (cb) => cb({ token: `Bearer ${localStorage.getItem("token")}` }),
     });
-    socket.on("notifications:new", (notification) => {
+    socket.on("notification:new", (notification) => {
       setNotifications((prev) => [notification, ...prev]);
       setUnreadCount((count) => count + 1);
       toast(notification.message, { icon: "🔔" });
@@ -79,15 +79,17 @@ const NotificationProvider = ({ children }) => {
     });
     return () => {
       const userId = user._id;
-      // console.log(userId);
+      //  console.log(user);
+      socket.disconnect()
     };
   }, [user, fetchNotifications]);
 
   const markAsRead = async (id) => {
-    const target = notifications.find((n) => n._id === id);
+    const targetId = String(id);
+    const target = notifications.find((n) => String(n._id) === targetId);
     if (!target || target.read) return;
     setNotifications((prev) =>
-      prev.map((n) => (n._id === id ? { ...n, read: true } : n)),
+      prev.map((n) => (String(n._id )=== targetId ? { ...n, read: true } : n)),
     );
     setUnreadCount((count) => Math.max(count - 1, 0));
 
@@ -106,7 +108,9 @@ const NotificationProvider = ({ children }) => {
     try {
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
-      await axiosInstance.put(API_PATHS.NOTIFICATIONS.MARK_ALL_AS_READ);
+    const result=  await axiosInstance.put(API_PATHS.NOTIFICATIONS.MARK_ALL_AS_READ);
+    console.log(result);
+    
     } catch (error) {
       console.error({
         message: "Error marking notifications",

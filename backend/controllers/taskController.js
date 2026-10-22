@@ -93,24 +93,6 @@ const getTasks = async (req, res) => {
 }),
 
     ])
-// const allTasks = await Task.countDocuments(
-//   req.user.role === "admin" ? {} : { assignedTo: { $in: [req.user._id] } },
-// );
-// const pendingTasks = await Task.countDocuments({
-//   ...filter,
-//   status: "Pending",
-//   ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
-// });
-// const completedTasks = await Task.countDocuments({
-//   ...filter,
-//   status: "Completed",
-//   ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
-// });
-// const inProgressTasks = await Task.countDocuments({
-//   ...filter,
-//   status: "In Progress",
-//   ...(req.user.role !== "admin" && { assignedTo: { $in: [req.user._id] } }),
-// });
 
 res.json({
   tasks,
