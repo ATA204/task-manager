@@ -165,7 +165,7 @@ The project covers the full cycle of a production-style app: a REST API with lay
 | --- | --- |
 | **Vercel** (Hobby, free) | Frontend as a static site, backend as one serverless function, daily **Vercel Cron** for reminders |
 | **MongoDB Atlas** (free M0) | Database for users, tasks, notifications and images |
-| **Render** (free, optional) | Fallback host for the backend as a long-running server, so Socket.io works |
+<!-- | **Render** (free, optional) | Fallback host for the backend as a long-running server, so Socket.io works | -->
 
 ---
 
