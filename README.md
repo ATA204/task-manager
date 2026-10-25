@@ -28,15 +28,12 @@ Admins create, assign and track work across a team. Members work through their t
 - [Architecture](#architecture)
 - [How It Works](#how-it-works)
 - [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
-- [Deployment on Vercel](#deployment-on-vercel)
 - [API Reference](#api-reference)
 - [Data Models](#data-models)
 - [Available Scripts](#available-scripts)
 - [Roadmap](#roadmap)
 - [Author](#author)
-- [License](#license)
 
 ---
 
