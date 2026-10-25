@@ -20,6 +20,20 @@ Admins create, assign and track work across a team. Members work through their t
 
 ---
 
+## Demo Accounts
+
+Log in with any of these accounts to try the app:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| 👑 Admin | `Admin_1@example.com` | `Password123` |
+| 👤 Member | `Member_1@example.com` | `Password123` |
+| 👤 Member | `Member_2@example.com` | `Password123` |
+| 👤 Member | `Member_3@example.com` | `Password123` |
+| 👤 Member | `Member_4@example.com` | `Password123` |
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
