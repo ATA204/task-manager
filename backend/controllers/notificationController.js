@@ -32,8 +32,9 @@ const getNotifications = async (req, res) => {
 // PUT /api/notifications/:id/read
 const markAsRead = async (req, res) => {
     try {
-        const notification = await Notification.findByIdAndUpdate(
-            { userId: String(req.user._id), _id: req?.params?.id},
+        // findOneAndUpdate (not findByIdAndUpdate): the filter also checks the owner
+        const notification = await Notification.findOneAndUpdate(
+            { userId: req.user._id, _id: req.params.id },
             { read: true, readAt: Date.now() },
             { new: true }
         )

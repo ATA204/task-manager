@@ -1,11 +1,15 @@
 const Task = require("../models/Task");
+const connectDB = require("../config/db");
 const { onTaskDueSoon, onTaskOverdue } = require("../services/notificationEvents");
 
 const CHECK_EVERY_MS = 60 * 60 * 1000;
 const DUE_SOON_WINDOW_MS = 24 * 60 * 60 * 1000;
 
+// Used by the hourly job (local / Render) and by GET /api/cron/reminders (Vercel Cron).
+// Returns { dueSoon, overdue } counts, or null if the check failed.
 const checkDueDates = async () => {
     try {
+        await connectDB();
         const now = new Date();
         const soon = new Date(now.getTime() + DUE_SOON_WINDOW_MS);
 
@@ -41,10 +45,11 @@ const checkDueDates = async () => {
         if (dueSoonTasks.length || overdueTasks.length) {
             console.log(`[reminders] due soon: ${dueSoonTasks.length}, overdue: ${overdueTasks.length}`);
         }
+        return { dueSoon: dueSoonTasks.length, overdue: overdueTasks.length };
     }
     catch (error) {
         console.error({message:"[reminders] check failed:",error: error.message});
-
+        return null;
     }
 
 }
@@ -53,4 +58,13 @@ const startTaskReminderJob = () => {
     setInterval(checkDueDates, CHECK_EVERY_MS);
 };
 
-module.exports = { startTaskReminderJob };
+// GET /api/cron/reminders (Vercel Cron, once a day; cronAuth runs first)
+const runReminderCron = async (req, res) => {
+    const result = await checkDueDates();
+    if (!result) {
+        return res.status(500).json({ message: "Reminder check failed" });
+    }
+    res.json({ message: "Reminder check done", ...result });
+};
+
+module.exports = { startTaskReminderJob, checkDueDates, runReminderCron };

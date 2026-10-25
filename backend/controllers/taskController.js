@@ -33,7 +33,7 @@ const createTask = async (req, res) => {
       todoCheckList,
     });
 
-    onTaskCreated(task, req.user); //Notification
+    await onTaskCreated(task, req.user); //Notification (awaited: serverless stops work after the response)
     res.status(201).json({ message: "Task Created Successfully ", task });
   } catch (error) {
     return res
@@ -150,7 +150,7 @@ const upadtaTask = async (req, res) => {
     task.assignedTo = req.body.assignedTo || task.assignedTo;
 
     const updatedTask = await task.save();
-    onTaskUpdated(updatedTask, before, req.user) //Notification
+    await onTaskUpdated(updatedTask, before, req.user) //Notification
     res.status(200).json({ message: "Task Updated Successfully", updatedTask });
   } catch (error) {
     return res
@@ -167,7 +167,7 @@ const deleteTask = async (req, res) => {
     }
 
     await task.deleteOne();
-    onTaskDeleted(task, req.user); //Notification
+    await onTaskDeleted(task, req.user); //Notification
     res.json({ message: "Task Deleted Successfully" });
   } catch (error) {
     return res
@@ -197,7 +197,7 @@ const updateTaskStatus = async (req, res) => {
       task.progress = 100;
     }
     await task.save();
-    onTaskStatusChanged(oldStatus, task, req.user)
+    await onTaskStatusChanged(oldStatus, task, req.user)
     res.json({ message: "Stauts Updated", task });
   } catch (error) {
     return res
@@ -250,7 +250,7 @@ const updateTaskChecklist = async (req, res) => {
       task.status = "Pending";
     }
     await task.save();
-    onChecklistUpdated(task, before, req.user);
+    await onChecklistUpdated(task, before, req.user);
     const updatedTask = await Task.findById(req.params.id).populate(
       "assignedTo",
       "name email profileImageUrl",

@@ -34,7 +34,7 @@ const registerUser = async (req, res) => {
       role,
       profileImageUrl,
     });
-    onUserRegistered(user)  //member gdeed
+    await onUserRegistered(user)  //member gdeed (awaited: serverless stops work after the response)
     res.status(200).json({
       _id: user._id,
       name: user.name,

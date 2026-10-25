@@ -1,4 +1,5 @@
-export const BASE_URL = "http://localhost:8000";
+// Backend URL: set VITE_API_URL (e.g. in Vercel). Falls back to the local API. No trailing slash.
+export const BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "");
 
 export const API_PATHS = {
   AUTH: {

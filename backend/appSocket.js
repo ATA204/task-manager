@@ -1,13 +1,14 @@
 const { Server } = require("socket.io");
 const { socketAuth } = require("./middlewares/socketAuth");
 const { registerSocketHandlers } = require("./controllers/socketController");
+const { getCorsOrigin } = require("./config/cors");
 
 let io = null;
 
 const initSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
-            origin: process.env.CLIENT_URL || "*",
+            origin: getCorsOrigin(), // same CLIENT_URL list as the REST API
             methods: ["POST", "GET"],
         },
     });
